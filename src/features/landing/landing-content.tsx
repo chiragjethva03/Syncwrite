@@ -36,19 +36,27 @@ const rise: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
 
-export function LandingContent() {
+export function LandingContent({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-4 py-4 sm:px-8">
         <Logo />
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button asChild variant="ghost" className="hidden sm:inline-flex">
-            <Link href="/login">Sign in</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/register">Get started</Link>
-          </Button>
+          {isAuthenticated ? (
+            <Button asChild>
+              <Link href="/dashboard">Go to dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button asChild variant="ghost" className="hidden sm:inline-flex">
+                <Link href="/login">Sign in</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/register">Get started</Link>
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
@@ -78,14 +86,24 @@ export function LandingContent() {
             {siteConfig.description}
           </motion.p>
           <motion.div variants={rise} className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/register">
-                Start writing <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/login">Sign in</Link>
-            </Button>
+            {isAuthenticated ? (
+              <Button asChild size="lg">
+                <Link href="/dashboard">
+                  Go to dashboard <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <Button asChild size="lg">
+                  <Link href="/register">
+                    Start writing <ArrowRight className="size-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link href="/login">Sign in</Link>
+                </Button>
+              </>
+            )}
           </motion.div>
         </motion.section>
 

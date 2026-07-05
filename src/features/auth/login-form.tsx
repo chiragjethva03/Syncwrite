@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -18,6 +18,13 @@ export function LoginForm() {
   const callbackUrl = params.get("callbackUrl") ?? "/dashboard";
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Surface auth errors redirected here (e.g. an interrupted Google sign-in).
+  useEffect(() => {
+    if (params.get("error")) {
+      toast.error("Sign-in didn't complete. Please try again.");
+    }
+  }, [params]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

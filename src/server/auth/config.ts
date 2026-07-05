@@ -39,7 +39,9 @@ export const BCRYPT_COST = 12;
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 30 },
-  pages: { signIn: "/login" },
+  // Route auth errors (e.g. a back-button that replays a consumed OAuth code)
+  // to our own /login screen instead of the raw NextAuth error page.
+  pages: { signIn: "/login", error: "/login" },
   trustHost: true,
   providers: [
     Google({
