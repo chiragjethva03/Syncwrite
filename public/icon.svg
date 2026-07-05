@@ -1,0 +1,8 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Syncwrite">
+  <rect width="512" height="512" rx="112" fill="#7c5cff"/>
+  <g fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M192 132h96l68 68v180a24 24 0 0 1-24 24H192a24 24 0 0 1-24-24V156a24 24 0 0 1 24-24Z"/>
+    <path d="M288 132v72h68"/>
+    <path d="M208 268h96M208 316h96"/>
+  </g>
+</svg>

@@ -35,7 +35,18 @@ const nextConfig: NextConfig = {
   // Prisma must stay external to the server bundle (native engine).
   serverExternalPackages: ["@prisma/client", "bcryptjs"],
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      {
+        // The service worker must never be cached, so clients always pick up a
+        // new version on the next visit.
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+        ],
+      },
+    ];
   },
 };
 
