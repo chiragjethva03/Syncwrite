@@ -10,7 +10,7 @@ synchronization**, **deterministic conflict resolution** (a block-level CRDT),
 > background sync engine that survives offline periods and race conditions, and a
 > merge algorithm that provably converges without losing edits.
 
-**🔗 Live demo:** _add your Vercel URL_ · **📦 Repo:** _add your GitHub URL_
+**🔗 Live demo:** https://syncwrite-ashen.vercel.app · **📦 Repo:** https://github.com/chiragjethva03/Syncwrite
 
 ---
 
@@ -22,6 +22,7 @@ synchronization**, **deterministic conflict resolution** (a block-level CRDT),
 | **Offline sync engine** | [`src/lib/sync/`](src/lib/sync) | Durable IndexedDB outbox, exponential-backoff retry, reconnect flush, optimistic-concurrency on the server. |
 | **Local-first store** | [`src/lib/db/dexie.ts`](src/lib/db/dexie.ts) | IndexedDB is the source of truth; the network is never on the typing path. |
 | **Version time-travel** | [`src/server/services/version.service.ts`](src/server/services/version.service.ts) | Non-destructive restore that propagates to collaborators. |
+| **CRDT Sync Inspector** | [`src/features/editor/sync-inspector.tsx`](src/features/editor/sync-inspector.tsx) | Live view of version vectors, Lamport clocks & per-block provenance — plus a one-click **convergence proof** (A⊕B ≡ B⊕A) run on the real document. Makes the distributed core visible. |
 | **Security / OOM defense** | [`src/server/http/`](src/server/http) + [docs](docs/security.md) | Size-guarded, Zod-bounded sync payloads; strict tenant scoping; RBAC. |
 
 ## Features
@@ -53,7 +54,9 @@ Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · shadcn/Radix UI · Ti
 Clean, layered, single Next.js app. Full write-up in
 **[docs/architecture.md](docs/architecture.md)**; conflict algorithm in
 **[docs/conflict-resolution.md](docs/conflict-resolution.md)**; threat model in
-**[docs/security.md](docs/security.md)**.
+**[docs/security.md](docs/security.md)**; offline/online behavior + how to test
+in **[docs/offline.md](docs/offline.md)**; and a full feature-by-feature
+walkthrough in **[docs/flows.md](docs/flows.md)**.
 
 ```
 app/ (routes + API)  features/ (feature UI)  components/  providers/  hooks/
@@ -108,9 +111,19 @@ npm run dev           # http://localhost:3000
 
 ### Try the offline flow
 
-Open a document, then in DevTools → Network set **Offline**. Keep typing — it
-works, the banner shows "Offline", and pending changes queue. Go back online and
-watch them sync. Open the same doc in a second browser to see collaboration.
+**Editing offline (works in dev too):** open a document, then in DevTools →
+Network set **Offline**. Keep typing — it works, the banner shows "Offline", and
+pending changes queue. Go back online and watch them sync. Open the same doc in a
+second browser to see collaboration.
+
+**Offline reload (deployed site):** the app is an installable PWA. On the
+deployed site, open a page once online (this installs the service worker), then
+go fully offline and **refresh** — the app boots from cache instead of the
+browser's error page, and IndexedDB drives the editor. The service worker is
+production-only (it would fight dev HMR), so test this on the Vercel URL, not
+`localhost`.
+
+Full behavior matrix + step-by-step tests: **[docs/offline.md](docs/offline.md)**.
 
 ## Scripts
 

@@ -71,3 +71,21 @@ export function getDb(): SyncwriteDB {
   dbInstance ??= new SyncwriteDB();
   return dbInstance;
 }
+
+/** localStorage key tracking which user the local (IndexedDB) cache belongs to. */
+export const ACTIVE_USER_KEY = "syncwrite:active-user";
+
+/**
+ * Wipe all locally-cached document state (bodies + sync outbox).
+ *
+ * Called on sign-out and when a *different* user signs in on the same browser,
+ * so one user can never see another's cached documents from local-first storage.
+ */
+export async function clearLocalData(): Promise<void> {
+  if (typeof indexedDB === "undefined") return;
+  const db = getDb();
+  await db.transaction("rw", db.docs, db.queue, async () => {
+    await db.docs.clear();
+    await db.queue.clear();
+  });
+}

@@ -74,7 +74,7 @@ export function OfflineBanner() {
       className="flex items-center justify-center gap-2 bg-warning/15 px-4 py-1.5 text-center text-xs font-medium text-warning"
     >
       <CloudOff className="size-3.5" />
-      You&apos;re offline — editing still works and everything will sync automatically.
+      You&apos;re offline. Editing still works and everything will sync automatically.
     </div>
   );
 }

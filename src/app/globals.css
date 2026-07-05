@@ -105,41 +105,41 @@
 }
 
 /* Editor (ProseMirror / TipTap) typography */
-.prose-editor .ProseMirror {
+.prose-editor {
   outline: none;
   min-height: 60vh;
 }
-.prose-editor .ProseMirror > * + * {
+.prose-editor > * + * {
   margin-top: 0.75em;
 }
-.prose-editor .ProseMirror h1 {
+.prose-editor h1 {
   font-size: 1.875rem;
   font-weight: 700;
   line-height: 1.2;
 }
-.prose-editor .ProseMirror h2 {
+.prose-editor h2 {
   font-size: 1.5rem;
   font-weight: 650;
 }
-.prose-editor .ProseMirror h3 {
+.prose-editor h3 {
   font-size: 1.25rem;
   font-weight: 600;
 }
-.prose-editor .ProseMirror ul {
+.prose-editor ul {
   list-style: disc;
   padding-left: 1.5rem;
 }
-.prose-editor .ProseMirror ol {
+.prose-editor ol {
   list-style: decimal;
   padding-left: 1.5rem;
 }
-.prose-editor .ProseMirror blockquote {
+.prose-editor blockquote {
   border-left: 3px solid var(--color-primary);
   padding-left: 1rem;
   color: var(--color-muted-foreground);
   font-style: italic;
 }
-.prose-editor .ProseMirror pre {
+.prose-editor pre {
   background: var(--color-muted);
   border-radius: var(--radius-md);
   padding: 0.9rem 1rem;
@@ -147,57 +147,160 @@
   font-size: 0.85rem;
   overflow-x: auto;
 }
-.prose-editor .ProseMirror code {
+.prose-editor code {
   font-family: var(--font-mono);
   font-size: 0.85em;
   background: var(--color-muted);
   padding: 0.1em 0.35em;
   border-radius: 4px;
 }
-.prose-editor .ProseMirror pre code {
+.prose-editor pre code {
   background: transparent;
   padding: 0;
 }
-.prose-editor .ProseMirror ul[data-type="taskList"] {
+
+/* Syntax highlighting (lowlight / highlight.js tokens) — VS Code palette.
+ * Light defaults below; `.dark` overrides mirror VS Code's Dark+ theme. */
+.prose-editor pre .hljs-comment,
+.prose-editor pre .hljs-quote {
+  color: #008000;
+  font-style: italic;
+}
+.prose-editor pre .hljs-keyword,
+.prose-editor pre .hljs-selector-tag,
+.prose-editor pre .hljs-literal,
+.prose-editor pre .hljs-doctag {
+  color: #0000ff;
+}
+.prose-editor pre .hljs-keyword.hljs-control,
+.prose-editor pre .hljs-meta {
+  color: #af00db;
+}
+.prose-editor pre .hljs-string,
+.prose-editor pre .hljs-regexp,
+.prose-editor pre .hljs-template-string {
+  color: #a31515;
+}
+.prose-editor pre .hljs-number,
+.prose-editor pre .hljs-symbol,
+.prose-editor pre .hljs-bullet {
+  color: #098658;
+}
+.prose-editor pre .hljs-title,
+.prose-editor pre .hljs-title.function_,
+.prose-editor pre .hljs-section {
+  color: #795e26;
+}
+.prose-editor pre .hljs-type,
+.prose-editor pre .hljs-class .hljs-title,
+.prose-editor pre .hljs-built_in,
+.prose-editor pre .hljs-title.class_ {
+  color: #267f99;
+}
+.prose-editor pre .hljs-attr,
+.prose-editor pre .hljs-attribute,
+.prose-editor pre .hljs-variable,
+.prose-editor pre .hljs-property,
+.prose-editor pre .hljs-params {
+  color: #001080;
+}
+.prose-editor pre .hljs-tag .hljs-name,
+.prose-editor pre .hljs-name {
+  color: #800000;
+}
+.prose-editor pre .hljs-emphasis {
+  font-style: italic;
+}
+.prose-editor pre .hljs-strong {
+  font-weight: 700;
+}
+
+.dark .prose-editor pre .hljs-comment,
+.dark .prose-editor pre .hljs-quote {
+  color: #6a9955;
+}
+.dark .prose-editor pre .hljs-keyword,
+.dark .prose-editor pre .hljs-selector-tag,
+.dark .prose-editor pre .hljs-literal,
+.dark .prose-editor pre .hljs-doctag {
+  color: #569cd6;
+}
+.dark .prose-editor pre .hljs-keyword.hljs-control,
+.dark .prose-editor pre .hljs-meta {
+  color: #c586c0;
+}
+.dark .prose-editor pre .hljs-string,
+.dark .prose-editor pre .hljs-regexp,
+.dark .prose-editor pre .hljs-template-string {
+  color: #ce9178;
+}
+.dark .prose-editor pre .hljs-number,
+.dark .prose-editor pre .hljs-symbol,
+.dark .prose-editor pre .hljs-bullet {
+  color: #b5cea8;
+}
+.dark .prose-editor pre .hljs-title,
+.dark .prose-editor pre .hljs-title.function_,
+.dark .prose-editor pre .hljs-section {
+  color: #dcdcaa;
+}
+.dark .prose-editor pre .hljs-type,
+.dark .prose-editor pre .hljs-class .hljs-title,
+.dark .prose-editor pre .hljs-built_in,
+.dark .prose-editor pre .hljs-title.class_ {
+  color: #4ec9b0;
+}
+.dark .prose-editor pre .hljs-attr,
+.dark .prose-editor pre .hljs-attribute,
+.dark .prose-editor pre .hljs-variable,
+.dark .prose-editor pre .hljs-property,
+.dark .prose-editor pre .hljs-params {
+  color: #9cdcfe;
+}
+.dark .prose-editor pre .hljs-tag .hljs-name,
+.dark .prose-editor pre .hljs-name {
+  color: #569cd6;
+}
+.prose-editor ul[data-type="taskList"] {
   list-style: none;
   padding-left: 0.25rem;
 }
-.prose-editor .ProseMirror ul[data-type="taskList"] li {
+.prose-editor ul[data-type="taskList"] li {
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
 }
-.prose-editor .ProseMirror ul[data-type="taskList"] li > label {
+.prose-editor ul[data-type="taskList"] li > label {
   margin-top: 0.15rem;
 }
-.prose-editor .ProseMirror table {
+.prose-editor table {
   border-collapse: collapse;
   width: 100%;
   margin: 0.5rem 0;
   table-layout: fixed;
 }
-.prose-editor .ProseMirror th,
-.prose-editor .ProseMirror td {
+.prose-editor th,
+.prose-editor td {
   border: 1px solid var(--color-border);
   padding: 0.4rem 0.6rem;
   min-width: 3rem;
 }
-.prose-editor .ProseMirror th {
+.prose-editor th {
   background: var(--color-muted);
   font-weight: 600;
 }
-.prose-editor .ProseMirror img {
+.prose-editor img {
   max-width: 100%;
   border-radius: var(--radius-md);
 }
-.prose-editor .ProseMirror p.is-editor-empty:first-child::before {
+.prose-editor p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   color: var(--color-muted-foreground);
   float: left;
   height: 0;
   pointer-events: none;
 }
-.prose-editor .ProseMirror a {
+.prose-editor a {
   color: var(--color-primary);
   text-decoration: underline;
   cursor: pointer;

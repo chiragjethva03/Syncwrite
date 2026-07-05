@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { BrandMark } from "@/components/logo";
 
 /** Inline brand marks (lucide dropped brand icons for trademark reasons). */
 function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -21,36 +22,56 @@ function LinkedinIcon(props: React.SVGProps<SVGSVGElement>) {
  * is a submission requirement. Content is sourced from config/site.ts.
  */
 export function AppFooter() {
-  const { developer, name } = siteConfig;
+  const { developer, name, tagline } = siteConfig;
+  const year = new Date().getFullYear();
   return (
     <footer className="border-t bg-card/40">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-5 text-sm text-muted-foreground sm:flex-row">
-        <p>
-          Built with Next.js 16 by{" "}
-          <span className="font-medium text-foreground">{developer.name}</span>
-        </p>
-        <div className="flex items-center gap-4">
-          <a
-            href={developer.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
-            aria-label="GitHub profile"
-          >
-            <GithubIcon /> GitHub
-          </a>
-          <a
-            href={developer.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
-            aria-label="LinkedIn profile"
-          >
-            <LinkedinIcon /> LinkedIn
-          </a>
-          <span className="hidden text-xs sm:inline">
-            © {new Date().getFullYear()} {name}
-          </span>
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="max-w-sm">
+            <div className="flex items-center gap-2">
+              <BrandMark className="size-6" />
+              <span className="font-semibold tracking-tight text-foreground">{name}</span>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {tagline}. Offline-ready editing, deterministic conflict resolution,
+              and version history in a single Next.js app.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 text-sm">
+            <p className="text-muted-foreground">
+              Designed &amp; built by{" "}
+              <span className="font-medium text-foreground">{developer.name}</span>
+            </p>
+            <div className="flex items-center gap-4 text-muted-foreground">
+              <a
+                href={developer.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+                aria-label="GitHub profile"
+              >
+                <GithubIcon /> GitHub
+              </a>
+              <a
+                href={developer.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+                aria-label="LinkedIn profile"
+              >
+                <LinkedinIcon /> LinkedIn
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 flex flex-col gap-2 border-t pt-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>Next.js 16 · React 19 · TypeScript · Tailwind · Prisma · CRDT sync</p>
+          <p>
+            © {year} {name}. Built for the House of Edtech assignment.
+          </p>
         </div>
       </div>
     </footer>

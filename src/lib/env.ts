@@ -23,6 +23,14 @@ const serverEnvSchema = z.object({
   // simply inactive; email/password auth still works.
   AUTH_GOOGLE_ID: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   AUTH_GOOGLE_SECRET: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+  // Signup email notifications (optional). If both are set, an email is sent to
+  // ADMIN_NOTIFY_EMAIL whenever a new account is created (Google or manual).
+  RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
+  ADMIN_NOTIFY_EMAIL: z.preprocess(emptyToUndefined, z.string().email().optional()),
+  NOTIFY_FROM_EMAIL: z.preprocess(
+    emptyToUndefined,
+    z.string().min(1).default("Syncwrite <onboarding@resend.dev>"),
+  ),
   GEMINI_API_KEY: z.preprocess(emptyToUndefined, z.string().min(1).optional()),
   // Gemini model id. Overridable so we can move off a model whose free-tier
   // quota Google has zeroed out (e.g. gemini-2.0-flash) without a code change.

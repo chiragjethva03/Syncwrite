@@ -16,7 +16,7 @@ export default async function AppLayout({
   if (!user) redirect("/login");
 
   return (
-    <SyncProvider>
+    <SyncProvider userId={user.id}>
       <div className="flex min-h-screen flex-col">
         <OfflineBanner />
         {children}

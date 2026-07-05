@@ -77,7 +77,10 @@ export function EditorCanvas({
   // Observe the local record for REMOTE changes and reflect them when idle.
   const localDoc = useLiveQuery(() => getLocalDoc(documentId), [documentId]);
   useEffect(() => {
-    if (!editor || !localDoc || editor.isFocused) return;
+    // Never re-project while the user is editing (focused) or has an unsaved
+    // local edit in flight — setContent would reset the caret/selection to the
+    // document start, making toolbar commands land on the wrong line.
+    if (!editor || !localDoc || editor.isFocused || pendingDoc.current) return;
     const projected = toProseMirror(localDoc.syncDoc);
     const projectedStr = JSON.stringify(projected);
     if (projectedStr === lastKnown.current) return;

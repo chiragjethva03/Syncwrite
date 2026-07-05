@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { SyncStatusIndicator } from "@/components/sync-status-indicator";
 import { EditorCanvas } from "./editor-canvas";
 import { VersionHistoryPanel } from "./version-history-panel";
+import { SyncInspector } from "./sync-inspector";
 import { ShareDialog } from "./share-dialog";
 import { fetchDocumentBootstrap, renameDocumentApi, type DocumentBootstrap } from "./api";
 import { ApiClientError } from "@/lib/api-client";
@@ -146,10 +147,11 @@ export function DocumentEditor({ documentId }: { documentId: string }) {
           onBlur={() => title.trim() || onTitleChange("Untitled document")}
           disabled={!canEdit}
           aria-label="Document title"
-          className="max-w-xs border-transparent bg-transparent px-2 text-base font-medium shadow-none focus-visible:bg-background focus-visible:ring-1"
+          className="min-w-0 flex-1 border-transparent bg-transparent px-2 text-base font-medium shadow-none focus-visible:bg-background focus-visible:ring-1 sm:max-w-xs sm:flex-none"
         />
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <SyncStatusIndicator />
+          <SyncInspector documentId={documentId} />
           <VersionHistoryPanel documentId={documentId} canEdit={canEdit} />
           {isOwner && !state.offline && <ShareDialog doc={doc} />}
           <ThemeToggle />

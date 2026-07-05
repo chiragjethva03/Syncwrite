@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/server/db/prisma";
 import { loginSchema } from "@/server/validators/auth";
+import { notifyNewSignup } from "@/server/services/notify.service";
 
 /**
  * Auth.js (NextAuth v5) configuration.
@@ -79,6 +80,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     session({ session, token }) {
       if (token.sub) session.user.id = token.sub;
       return session;
+    },
+  },
+  events: {
+    // Fires when the adapter creates a brand-new user (i.e. first Google sign-in).
+    // Credentials signups are notified separately in auth/register.ts.
+    async createUser({ user }) {
+      await notifyNewSignup({ name: user.name, email: user.email }, "google");
     },
   },
 });

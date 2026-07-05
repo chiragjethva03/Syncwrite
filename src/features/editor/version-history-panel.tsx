@@ -63,7 +63,7 @@ export function VersionHistoryPanel({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1.5">
-          <History className="size-4" /> History
+          <History className="size-4" /> <span className="hidden sm:inline">History</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md">

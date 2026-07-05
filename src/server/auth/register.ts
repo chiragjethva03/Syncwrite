@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/server/db/prisma";
 import { AppError, ErrorCode } from "@/server/http/response";
 import { registerSchema, type RegisterInput } from "@/server/validators/auth";
+import { notifyNewSignup } from "@/server/services/notify.service";
 import { BCRYPT_COST } from "./config";
 
 /**
@@ -22,6 +23,9 @@ export async function registerUser(input: RegisterInput) {
     data: { name, email, passwordHash },
     select: { id: true, name: true, email: true },
   });
+
+  // Notify the admin of the new signup (never blocks/fails registration).
+  await notifyNewSignup(user, "credentials");
 
   return user;
 }

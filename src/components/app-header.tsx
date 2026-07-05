@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { FileText, LogOut, User as UserIcon } from "lucide-react";
-import { siteConfig } from "@/config/site";
+import { useQueryClient } from "@tanstack/react-query";
+import { LogOut, User as UserIcon } from "lucide-react";
+import { ACTIVE_USER_KEY, clearLocalData } from "@/lib/db/dexie";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SyncStatusIndicator } from "@/components/sync-status-indicator";
+import { Logo } from "@/components/logo";
 
 interface AppHeaderProps {
   user: { name: string | null; email: string | null };
@@ -26,6 +28,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ user, center }: AppHeaderProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const initials = (user.name ?? user.email ?? "U")
     .split(" ")
     .map((s) => s[0])
@@ -35,11 +38,8 @@ export function AppHeader({ user, center }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur">
-      <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-        <span className="grid size-7 place-items-center rounded-lg bg-primary text-primary-foreground">
-          <FileText className="size-4" />
-        </span>
-        <span className="hidden sm:inline">{siteConfig.name}</span>
+      <Link href="/" aria-label="Syncwrite home">
+        <Logo textClassName="hidden sm:inline" />
       </Link>
 
       <div className="flex min-w-0 flex-1 items-center justify-center">{center}</div>
@@ -70,6 +70,11 @@ export function AppHeader({ user, center }: AppHeaderProps) {
               variant="destructive"
               onClick={async () => {
                 await signOut({ redirect: false });
+                // Clear all per-user client state so the next user on this
+                // browser never sees this account's cached documents.
+                await clearLocalData();
+                queryClient.clear();
+                localStorage.removeItem(ACTIVE_USER_KEY);
                 router.push("/login");
                 router.refresh();
               }}

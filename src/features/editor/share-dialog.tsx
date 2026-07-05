@@ -55,7 +55,7 @@ export function ShareDialog({ doc }: { doc: DocumentBootstrap }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1.5">
-          <UserPlus className="size-4" /> Share
+          <UserPlus className="size-4" /> <span className="hidden sm:inline">Share</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

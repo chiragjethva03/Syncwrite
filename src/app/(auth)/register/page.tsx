@@ -15,7 +15,7 @@ export default function RegisterPage() {
     <Card>
       <CardHeader>
         <CardTitle className="text-xl">Create your account</CardTitle>
-        <CardDescription>Start writing — online or offline.</CardDescription>
+        <CardDescription>Start writing, online or offline.</CardDescription>
       </CardHeader>
       <CardContent>
         <RegisterForm />

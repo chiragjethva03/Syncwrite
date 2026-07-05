@@ -34,7 +34,7 @@ export function DashboardView({ userId }: { userId: string }) {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Your documents</h1>
           <p className="text-sm text-muted-foreground">
-            Local-first — everything you open works offline.
+            Your local-first workspace. Everything you open works offline.
           </p>
         </div>
         <Button onClick={onCreate} disabled={create.isPending}>
