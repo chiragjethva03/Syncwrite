@@ -1,0 +1,41 @@
+# Local full-stack: Postgres + the Next.js app.
+# Usage:
+#   docker compose up --build
+#   docker compose exec app npx prisma migrate deploy   # apply migrations
+#   docker compose exec app npm run db:seed             # optional demo data
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: syncwrite
+      POSTGRES_PASSWORD: syncwrite
+      POSTGRES_DB: syncwrite
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U syncwrite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://syncwrite:syncwrite@db:5432/syncwrite"
+      DIRECT_URL: "postgresql://syncwrite:syncwrite@db:5432/syncwrite"
+      AUTH_SECRET: "local-dev-secret-change-me-000000000000000000"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      MAX_SYNC_PAYLOAD_BYTES: "1048576"
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

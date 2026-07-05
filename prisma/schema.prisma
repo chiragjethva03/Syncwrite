@@ -1,0 +1,215 @@
+// Prisma schema — PostgreSQL (Supabase).
+//
+// Design notes:
+// - `Document.serverVersion` is the authoritative monotonically-increasing
+//   version counter. Every accepted batch of operations bumps it. Clients send
+//   the `baseVersion` they were working from so the server can detect concurrent
+//   edits (baseVersion < serverVersion => potential conflict => merge).
+// - `Document.versionVector` maps deviceId -> highest lamport clock the server
+//   has integrated from that device. This lets us distinguish causal from
+//   concurrent operations without a central lock.
+// - `Operation` is the durable, append-only server-side operation log. The
+//   client-side SyncQueue (IndexedDB / Dexie) mirrors *pending* ops; once
+//   acknowledged they live here permanently and drive deterministic replay.
+// - Row ownership is always scoped through `Document.ownerId` + `Collaborator`,
+//   which is how we enforce tenant isolation at the ORM layer (see repositories).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase: pooled URL for the app, direct URL for migrations. Optional in dev.
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum VersionOrigin {
+  SNAPSHOT // user explicitly captured a snapshot
+  RESTORE // created by restoring an older version (non-destructive)
+  AUTO // periodic/auto checkpoint
+}
+
+enum OperationType {
+  UPDATE // content replace/merge for a document (block-level)
+  RESTORE // a restore event materialized as an operation
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  emailVerified DateTime? // set by the Auth.js adapter for OAuth (e.g. Google) sign-ins
+  passwordHash  String? // null for OAuth-only accounts
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  ownedDocuments Document[]     @relation("DocumentOwner")
+  collaborations Collaborator[]
+  versions       Version[]
+  operations     Operation[]
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]
+  accounts       Account[]
+  sessions       Session[]
+
+  @@map("users")
+}
+
+model Document {
+  id          String    @id @default(cuid())
+  title       String    @default("Untitled document")
+  // Canonical document content as TipTap/ProseMirror JSON.
+  content     Json
+  // Denormalized plaintext for full-text search + AI context. Kept in sync on write.
+  contentText String    @default("")
+  ownerId     String
+  owner       User      @relation("DocumentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // Authoritative version counter; incremented on every accepted sync batch.
+  serverVersion Int  @default(0)
+  // deviceId -> last integrated lamport clock. Powers concurrency detection.
+  versionVector Json @default("{}")
+
+  deletedAt DateTime? // soft delete
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  collaborators Collaborator[]
+  versions      Version[]
+  operations    Operation[]
+  auditLogs     AuditLog[]
+
+  @@index([ownerId])
+  @@index([updatedAt])
+  @@map("documents")
+}
+
+model Collaborator {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       Role     @default(VIEWER)
+  createdAt  DateTime @default(now())
+
+  @@unique([documentId, userId])
+  @@index([userId])
+  @@map("collaborators")
+}
+
+model Version {
+  id            String        @id @default(cuid())
+  documentId    String
+  document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  // Snapshot of content at capture time (immutable).
+  content       Json
+  // Human-facing sequential number within the document.
+  versionNumber Int
+  label         String?
+  origin        VersionOrigin @default(SNAPSHOT)
+  // For RESTORE versions: which version was restored from (audit trail / history graph).
+  restoredFromId String?
+  createdById   String
+  createdBy     User          @relation(fields: [createdById], references: [id])
+  createdAt     DateTime      @default(now())
+
+  @@unique([documentId, versionNumber])
+  @@index([documentId, createdAt])
+  @@map("versions")
+}
+
+// Append-only operation log. Durable server-side twin of the client SyncQueue.
+model Operation {
+  id            String        @id @default(cuid())
+  // Client-generated idempotency key. Unique => safe retries never double-apply.
+  opId          String        @unique
+  documentId    String
+  document      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  authorId      String
+  author        User          @relation(fields: [authorId], references: [id])
+  type          OperationType @default(UPDATE)
+  deviceId      String
+  // Lamport logical clock for this op (per device, monotonically increasing).
+  lamport       Int
+  // Server version the client believed it was editing against.
+  baseVersion   Int
+  // The op payload (structured block diff — see domain/merge).
+  payload       Json
+  // Server version assigned after this op was integrated.
+  resultVersion Int
+  createdAt     DateTime      @default(now())
+
+  @@index([documentId, resultVersion])
+  @@map("operations")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Only the hash is stored; the raw token is returned to the client once.
+  tokenHash String    @unique
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  action     String // e.g. "document.create", "sync.reject", "version.restore"
+  metadata   Json     @default("{}")
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([documentId, createdAt])
+  @@map("audit_logs")
+}
+
+// ---- Auth.js (NextAuth) adapter models ----
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}

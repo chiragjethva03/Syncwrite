@@ -1,26 +1,204 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens (shadcn-style) wired for Tailwind v4.
+ * Colors are OKLCH for perceptually-even light/dark themes. The `.dark` class
+ * (set by next-themes) flips the palette.
+ */
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.65rem;
+
+  --background: oklch(0.99 0.002 265);
+  --foreground: oklch(0.2 0.02 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.02 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.02 265);
+  --primary: oklch(0.55 0.22 275);
+  --primary-foreground: oklch(0.99 0.005 275);
+  --secondary: oklch(0.96 0.01 265);
+  --secondary-foreground: oklch(0.25 0.02 265);
+  --muted: oklch(0.96 0.008 265);
+  --muted-foreground: oklch(0.55 0.02 265);
+  --accent: oklch(0.95 0.03 275);
+  --accent-foreground: oklch(0.3 0.06 275);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.99 0.005 27);
+  --success: oklch(0.62 0.16 150);
+  --warning: oklch(0.72 0.16 70);
+  --border: oklch(0.92 0.006 265);
+  --input: oklch(0.92 0.006 265);
+  --ring: oklch(0.55 0.22 275);
+}
+
+.dark {
+  --background: oklch(0.17 0.015 265);
+  --foreground: oklch(0.96 0.005 265);
+  --card: oklch(0.21 0.018 265);
+  --card-foreground: oklch(0.96 0.005 265);
+  --popover: oklch(0.21 0.018 265);
+  --popover-foreground: oklch(0.96 0.005 265);
+  --primary: oklch(0.68 0.19 280);
+  --primary-foreground: oklch(0.16 0.02 280);
+  --secondary: oklch(0.27 0.02 265);
+  --secondary-foreground: oklch(0.96 0.005 265);
+  --muted: oklch(0.27 0.02 265);
+  --muted-foreground: oklch(0.7 0.02 265);
+  --accent: oklch(0.3 0.04 280);
+  --accent-foreground: oklch(0.95 0.02 280);
+  --destructive: oklch(0.62 0.2 25);
+  --destructive-foreground: oklch(0.98 0.005 25);
+  --success: oklch(0.68 0.15 152);
+  --warning: oklch(0.75 0.15 72);
+  --border: oklch(0.3 0.02 265);
+  --input: oklch(0.32 0.02 265);
+  --ring: oklch(0.68 0.19 280);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background-color: color-mix(in oklch, var(--color-primary) 25%, transparent);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Editor (ProseMirror / TipTap) typography */
+.prose-editor .ProseMirror {
+  outline: none;
+  min-height: 60vh;
+}
+.prose-editor .ProseMirror > * + * {
+  margin-top: 0.75em;
+}
+.prose-editor .ProseMirror h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.prose-editor .ProseMirror h2 {
+  font-size: 1.5rem;
+  font-weight: 650;
+}
+.prose-editor .ProseMirror h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.prose-editor .ProseMirror ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+.prose-editor .ProseMirror ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+.prose-editor .ProseMirror blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding-left: 1rem;
+  color: var(--color-muted-foreground);
+  font-style: italic;
+}
+.prose-editor .ProseMirror pre {
+  background: var(--color-muted);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  overflow-x: auto;
+}
+.prose-editor .ProseMirror code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-muted);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.prose-editor .ProseMirror pre code {
+  background: transparent;
+  padding: 0;
+}
+.prose-editor .ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0.25rem;
+}
+.prose-editor .ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.prose-editor .ProseMirror ul[data-type="taskList"] li > label {
+  margin-top: 0.15rem;
+}
+.prose-editor .ProseMirror table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.5rem 0;
+  table-layout: fixed;
+}
+.prose-editor .ProseMirror th,
+.prose-editor .ProseMirror td {
+  border: 1px solid var(--color-border);
+  padding: 0.4rem 0.6rem;
+  min-width: 3rem;
+}
+.prose-editor .ProseMirror th {
+  background: var(--color-muted);
+  font-weight: 600;
+}
+.prose-editor .ProseMirror img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+}
+.prose-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-muted-foreground);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.prose-editor .ProseMirror a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
 }
